@@ -1,0 +1,16 @@
+<snippet>
+    <content><![CDATA[
+- table: $1
+  package: ${2:latex}
+  type: ${3:math}
+  keywords:
+    - $4
+  symbols:
+    - $5 ]]></content>
+    <!-- Optional: Tab trigger to activate the snippet -->
+    <!-- <tabTrigger></tabTrigger> -->
+    <!-- Optional: Scope the tab trigger will be active in -->
+    <scope>source.yaml</scope>
+    <!-- Optional: Description to show in the menu -->
+    <description>Table for symbols.yaml</description>
+</snippet>

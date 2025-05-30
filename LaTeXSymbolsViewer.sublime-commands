@@ -1,0 +1,18 @@
+[
+  {
+    "caption": "LaTeXSymbols: Show popup and search",
+    "command": "live_filter_latex_symbols"
+  },
+  {
+    "caption": "LaTeXSymbols: Show symbols by Keyword",
+    "command": "latex_symbols_by_keyword"
+  },
+  {
+    "caption": "LaTeXSymbols: Show symbols by Package",
+    "command": "latex_symbols_by_package"
+  },
+  {
+    "caption": "LaTeXSymbols: Update database and icons",
+    "command": "latex_symbols_refresh",
+  }
+]

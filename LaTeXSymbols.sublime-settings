@@ -1,0 +1,5 @@
+{
+  // "dark": the background is dark and LaTeX characters are white
+  // "light": the background is light and the LaTeX characters are black
+  "symbols_color": "dark",
+}
