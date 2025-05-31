@@ -37,13 +37,13 @@ text and close the popup. You can also copy a package name by clicking on it.
 
 LaTeX Symbols is designed to let the user customize the symbols list. For that:
 
-1. Use the command `LaTeXSymbols: Customize Symbols YAML list` to create and open a copy
-of the original `symbols.yaml` file in your `User/LaTeXSymbols/` folder. 
+1. Use the command `LaTeXSymbols: Customize Symbols YAML list` to open your copy
+of the original `symbols.yaml` file, put in the `User/LaTeXSymbols/` folder. 
 
 2. Add symbols, modify the keywords, comment useless tables, etc. directly in the new
 `symbols.yaml` file. The yaml syntax should be sufficiently self-explanatory. A `Snippet:
 table for symbols.yaml` is included with the package to facilitate the procedure. Check
-that the yaml syntax is respected (be careful about tabs and spaces).
+that the yaml syntax is respected (be careful about spaces).
 
 3. Use the command-palette entry `LaTeXSymbols: Update database and icons` to update the
 database. For new symbols, the compilation process to generate thumbnails is run in the
@@ -67,7 +67,7 @@ request!
 LaTeX Symbols for Sublime Text is adapted from @wookayin's [Alfred]
 (https://www.alfredapp.com/) workflow [alfred-latex-symbols-workflow]
 (https://github.com/wookayin/alfred-latex-symbols-workflow). Symbols were taken from
-there and completed (a little bit) thanks to S. Pakin's [Comprehensive LaTeX Symbol List]
+there and completed (a bit) thanks to S. Pakin's [Comprehensive LaTeX Symbol List]
 (https://ctan.org/pkg/comprehensive).
 
 alfred-latex-symbols-workflow is © 2015-2021 Jongwook Choi under the MIT License.

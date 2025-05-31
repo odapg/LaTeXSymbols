@@ -363,24 +363,12 @@ class LatexSymbolsRefreshCommand(sublime_plugin.WindowCommand):
         return True
 
 
-# ------------------- Text command to insert text in the view ---------------------
-
-class LsInsertInView(TextCommand):
-    def run(self, edit, text):
-        for s in self.view.sel(): 
-            point = s.a
-            self.view.insert(edit, point, text)
-
-
 # ----------------- Command to customize the symbols.yaml file -------------------
 
 class EditSymbolsFileCommand(sublime_plugin.WindowCommand):
     def run(self):
         
         file_name = "symbols.yaml"
-
-
-        # Define source and destination paths
         symbols_path = os.path.join(sublime.packages_path(), "LaTeXSymbols", file_name)
         user_symbols_dir = os.path.join(sublime.packages_path(), "User", "LaTeXSymbols")
         user_symbols_path = os.path.join(user_symbols_dir, file_name)
@@ -396,4 +384,13 @@ class EditSymbolsFileCommand(sublime_plugin.WindowCommand):
             else:
                 sublime.error_message(
                     "Source file does not exist:\n{}".format(symbols_path))
+
+
+# ------------------- Text command to insert text in the view ---------------------
+
+class LsInsertInView(TextCommand):
+    def run(self, edit, text):
+        for s in self.view.sel(): 
+            point = s.a
+            self.view.insert(edit, point, text)
 

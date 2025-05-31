@@ -13,8 +13,7 @@ st_pkgs_dir = Path(__file__).resolve().parent.parent.parent
 INPUT_YAML = "symbols.yaml"
 PKG_ICON_DIR = Path("LaTeXSymbols/icons")
 USER_ICON_DIR = Path("User/LaTeXSymbols/icons")
-USER_LOG_DIR = Path("User/LaTeXSymbols/log")
-LOG_DIR = Path("./logs")
+# USER_LOG_DIR = Path("User/LaTeXSymbols/log")
 METADATA_FILE = "symbols_data.json"
 COLORS = ["white", "black"]
 ICON_SIZE = "64x64"
@@ -62,7 +61,6 @@ def run_command(command, log_path=None):
     )
     if result.returncode != 0 and log_path:
         with open(log_path, "wb") as f:
-            #f.write(result.stdout + b"\n" + result.stderr)
             f.write(result.stdout + b"\n" + result.stderr)
     return result.returncode == 0
 
@@ -92,7 +90,7 @@ def generate_icon(symbol, color):
         basename = "symbol"
         tex_path = Path(tmpdir) / f"{basename}.tex"
         dvi_path = Path(tmpdir) / f"{basename}.dvi"
-        log_path = USER_LOG_DIR / f"{filename}.log"
+        # log_path = USER_LOG_DIR / f"{filename}.log"
 
         packages = ""
         if package and package.lower() != "latex":
@@ -111,9 +109,7 @@ def generate_icon(symbol, color):
                                 tex_path
                               ],
                             )
-            #f"latex -interaction=batchmode -output-directory={tmpdir} {tex_path}",
-            # 
-            # log_path=log_path
+                    # log_path=log_path
         if not success or not dvi_path.exists():
             return None, "latex_failed"
 
@@ -126,10 +122,8 @@ def generate_icon(symbol, color):
                                 "-o", f"{output_path}",
                                 f"{dvi_path}"
                                 ]
-
                             )
-            # f"dvipng -bg Transparent -T tight -D {DPI} --gamma {GAMMA} -o '{output_path}' {dvi_path}",
-            # log_path=log_path,
+                     # log_path=log_path,
         if not success:
             return None, "dvipng_failed"
 
@@ -143,8 +137,6 @@ def generate_icon(symbol, color):
                                 ]
                             )
                      # log_path=log_path,
-        # f"mogrify -resize '{ICON_SIZE}>' -extent '{ICON_SIZE}' "
-        # f"-background transparent -gravity center '{output_path}'",
         if not success:
             output_path.unlink(missing_ok=True)
             return None, "mogrify_failed"
