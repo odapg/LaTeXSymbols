@@ -16,7 +16,7 @@ html {background-color: #354551; padding: 3px; border: 1px solid white; margin-b
 h1 {color: #edab26; font-size: 1.2em; text-align: center; margin-top: 0; margin-bottom: 1;}
 h3 {color: #d7bdff; font-size: 1.1em; text-align: left; margin-top: 0; margin-bottom: 1;}
 a { text-decoration: none; }
-type-b { color: #d7d9ff; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
+type-b { color: #7bcf78; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
 type-t { color: #aed7ff; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
 type-m { color: #ffcbd8; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
 insert { color: #807e44;}
@@ -28,9 +28,9 @@ html {background-color: #f0fff6; padding: 3px; border: 1px solid white; margin-b
 h1 {color: #edab26; font-size: 1.2em; text-align: center; margin-top: 0; margin-bottom: 1;}
 h3 {color: #d7bdff; font-size: 1.1em; text-align: left; margin-top: 0; margin-bottom: 1;}
 a { text-decoration: none; }
-type-b { color: #474b6c; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
-type-t { color: #366175; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
-type-m { color: #785153; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
+type-b { color: #00d542; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
+type-t { color: #2d2eda; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
+type-m { color: #db3f43; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
 insert { color: #75742b;}
 .latex-sym { text-align: left; color: #4f7751; }
 </style>"""
@@ -58,10 +58,15 @@ def image_to_base64(pkg_path):
 # -------------
 
 def generate_html(grouped):
-    max_per_row = 4
     icon_size = 16
+
     ls_settings = sublime.load_settings('LaTeXSymbols.sublime-settings')
-    theme = ls_settings.get('symbols_color')
+
+    max_per_row = ls_settings.get('columns_number')
+    if max_per_row < 2 or max_per_row > 5:
+        max_per_row = 4
+
+    theme = ls_settings.get('background_color')
     if theme == "dark":
         color = "white"
         STYLE = DARK_STYLE
@@ -82,7 +87,7 @@ def generate_html(grouped):
 
             for j, s in enumerate(row):
                 name = s["name"]
-                ws = "&nbsp;" * (20 - len(name)) if j < max_per_row -1 else ""
+                ws = "&nbsp;" * (21 - len(name)) if j < max_per_row -1 else ""
                 encoded = image_to_base64("icons/"+ color + "/" + s["path"][color])
                 if s["type"] == "both":
                     type = "<type-b>Ⓑ</type-b>"
@@ -127,8 +132,13 @@ class SymbolSearchSession:
         self.view = view
         self.symbols = load_symbols()
         self.last_filter_text = ""
-        visible_region = self.view.visible_region()
-        self.fixed_location = visible_region.a
+        ls_settings = sublime.load_settings('LaTeXSymbols.sublime-settings')
+        at_caret = ls_settings.get('at_caret')
+        if at_caret:
+            self.fixed_location = -1
+        else:    
+            visible_region = self.view.visible_region()
+            self.fixed_location = visible_region.a
 
 # -------------
 
@@ -168,7 +178,7 @@ class SymbolSearchSession:
     def on_click(self, href):
         if href.startswith("ins-"):
             self.view.run_command('ls_insert_in_view', 
-                        {'text': "\\"+href[4:]})
+                        {'text': href[4:]})
             self.view.hide_popup()
             self.view.window().run_command("hide_panel", {"panel": "input"})
 
@@ -185,7 +195,7 @@ class SymbolSearchSession:
         pass
 
 
-# -----------------------------  Main Command  ----------------------------------
+# -------------  Command to display symbols and start filtering ---------------------
 
 class LiveFilterLatexSymbolsCommand(sublime_plugin.WindowCommand):
 
@@ -208,54 +218,6 @@ class LiveFilterLatexSymbolsCommand(sublime_plugin.WindowCommand):
 
     def on_cancel(self):
         self.window.active_view().hide_popup()
-
-
-# -----------------------------  Refresh database  ----------------------------------
-
-class RunIconGeneratorThread(threading.Thread):
-    def __init__(self, window):
-        threading.Thread.__init__(self)
-        self.window = window
-
-    def run(self):
-        LS_dir = os.path.join(sublime.packages_path(), "LaTeXSymbols") 
-        script_path = os.path.join(LS_dir, "utils", "icon_generator.py")
-
-        if not os.path.isfile(script_path):
-            sublime.error_message("Script not found:\n" + script_path)
-            return
-
-        try:
-            process = subprocess.Popen(
-                ["python3", script_path],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
-                cwd=LS_dir
-            )
-
-            output = ""
-            for line in process.stdout:
-                print("[icon-generator] " + line.strip())
-                output += line
-
-            process.wait()
-            if process.returncode != 0:
-                print(f"[icon-generator] Process exited with code {process.returncode}")
-            else:
-                print("[icon-generator] ✅ Done")
-
-        except Exception as e:
-            sublime.error_message("Error running script:\n" + str(e))
-
-
-class LatexSymbolsRefreshCommand(sublime_plugin.WindowCommand):
-    def run(self):
-        thread = RunIconGeneratorThread(self.window)
-        thread.start()
-
-    def is_enabled(self):
-        return True
 
 
 # ------------ Command to display symbols corresponding to a keyword --------------
@@ -342,6 +304,54 @@ class PackageInputHandler(sublime_plugin.ListInputHandler):
             if isinstance(pkg, str) and pkg.strip():
                 packages.add(pkg.strip())
         return sorted(packages)
+
+
+# -----------------------------  Refresh database  ----------------------------------
+
+class RunIconGeneratorThread(threading.Thread):
+    def __init__(self, window):
+        threading.Thread.__init__(self)
+        self.window = window
+
+    def run(self):
+        LS_dir = os.path.join(sublime.packages_path(), "LaTeXSymbols") 
+        script_path = os.path.join(LS_dir, "utils", "icon_generator.py")
+
+        if not os.path.isfile(script_path):
+            sublime.error_message("Script not found:\n" + script_path)
+            return
+
+        try:
+            process = subprocess.Popen(
+                ["python3", script_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                cwd=LS_dir
+            )
+
+            output = ""
+            for line in process.stdout:
+                print("[icon-generator] " + line.strip())
+                output += line
+
+            process.wait()
+            if process.returncode != 0:
+                print(f"[icon-generator] Process exited with code {process.returncode}")
+            else:
+                print("[icon-generator] ✅ Done")
+
+        except Exception as e:
+            sublime.error_message("Error running script:\n" + str(e))
+
+
+class LatexSymbolsRefreshCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        thread = RunIconGeneratorThread(self.window)
+        thread.start()
+
+    def is_enabled(self):
+        return True
 
 
 # ------------------- Text command to insert text in the view ---------------------

@@ -60,7 +60,7 @@ def generate_icon(symbol, color):
         basename = "symbol"
         tex_path = Path(tmpdir) / f"{basename}.tex"
         dvi_path = Path(tmpdir) / f"{basename}.dvi"
-        log_path = LOG_DIR / f"{filename}.log"
+        # log_path = LOG_DIR / f"{filename}.log"
 
         packages = ""
         if package and package.lower() != "latex":
@@ -110,6 +110,7 @@ def main():
         for symbol in table.get("symbols", [])
     ]
     total = len(all_symbols)
+    success_total = 0
 
     for index, (table, command) in enumerate(all_symbols):
         package = table.get("package")
@@ -128,9 +129,9 @@ def main():
             symbol_data["fontenc"] = table["fontenc"]
 
         paths = {}
+
         for color in COLORS:
             icon_name, status = generate_icon(symbol_data, color)
-            symbol_name = command.strip("\\")
             msg = f"[{index+1}/{total}] {command.ljust(20)} ({color}) : "
             if status == "exists":
                 print(msg + "⏩ Already exists")
@@ -153,11 +154,12 @@ def main():
                 "keywords": keywords,
                 "path": paths,
             } )
+            success_total += 1
 
     with open(METADATA_PATH, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2, ensure_ascii=False)
 
-    print(f"\n✅ Done. Data saved to {METADATA_PATH}")
+    print(f"\n✅ Done. {success_total} entries generated. Data saved to {METADATA_PATH}")
 
 if __name__ == "__main__":
     main()
