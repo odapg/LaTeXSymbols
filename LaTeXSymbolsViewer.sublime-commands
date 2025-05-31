@@ -14,5 +14,9 @@
   {
     "caption": "LaTeXSymbols: Update database and icons",
     "command": "latex_symbols_refresh",
-  }
+  },
+  {
+    "caption": "LaTeXSymbols: Customize Symbols YAML list",
+    "command": "edit_symbols_file",
+  },
 ]

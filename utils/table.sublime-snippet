@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-- table: $1
+    <content><![CDATA[- table: $1
   package: ${2:latex}
   type: ${3:math}
   keywords:
@@ -12,5 +11,5 @@
     <!-- Optional: Scope the tab trigger will be active in -->
     <scope>source.yaml</scope>
     <!-- Optional: Description to show in the menu -->
-    <description>Table for symbols.yaml</description>
+    <description>Table for symbols.yaml (LaTeXSymbols)</description>
 </snippet>

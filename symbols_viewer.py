@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 import os
+import shutil
 import json
 import base64
 import subprocess
@@ -39,8 +40,14 @@ insert { color: #75742b;}
 # ------------------------------------  Helpers  ------------------------------------
 
 def load_symbols():
-    data_path = os.path.join(
+    user_symbols_data = os.path.join(
+        sublime.packages_path(), "User", "LaTeXSymbols", "symbols_data.json")
+    ls_symbols_data = os.path.join(
         sublime.packages_path(), "LaTeXSymbols", "symbols_data.json")
+    if os.path.isfile(user_symbols_data):
+        data_path = user_symbols_data
+    else:
+        data_path = ls_symbols_data
     with open(data_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -88,7 +95,9 @@ def generate_html(grouped):
             for j, s in enumerate(row):
                 name = s["name"]
                 ws = "&nbsp;" * (21 - len(name)) if j < max_per_row -1 else ""
-                encoded = image_to_base64("icons/"+ color + "/" + s["path"][color])
+                icon_path = os.path.join(sublime.packages_path(), s["path"][color])
+                print(icon_path)
+                encoded = image_to_base64(icon_path)
                 if s["type"] == "both":
                     type = "<type-b>Ⓑ</type-b>"
                 elif s["type"] == "math":
@@ -361,4 +370,30 @@ class LsInsertInView(TextCommand):
         for s in self.view.sel(): 
             point = s.a
             self.view.insert(edit, point, text)
+
+
+# ----------------- Command to customize the symbols.yaml file -------------------
+
+class EditSymbolsFileCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        
+        file_name = "symbols.yaml"
+
+
+        # Define source and destination paths
+        symbols_path = os.path.join(sublime.packages_path(), "LaTeXSymbols", file_name)
+        user_symbols_dir = os.path.join(sublime.packages_path(), "User", "LaTeXSymbols")
+        user_symbols_path = os.path.join(user_symbols_dir, file_name)
+
+        if os.path.exists(user_symbols_path):
+            self.window.open_file(user_symbols_path)
+        else:
+            os.makedirs(user_symbols_dir, exist_ok=True)
+
+            if os.path.exists(symbols_path):
+                shutil.copyfile(symbols_path, user_symbols_path)
+                self.window.open_file(user_symbols_path)
+            else:
+                sublime.error_message(
+                    "Source file does not exist:\n{}".format(symbols_path))
 
