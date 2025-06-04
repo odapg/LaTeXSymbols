@@ -1,10 +1,37 @@
 {
+  // -------------- Main options --------------- //
+
   // "dark": the background is dark and LaTeX characters are white
   // "light": the background is light and the LaTeX characters are black
   "background_color": "dark",
+
   // Should be between 2 and 5
   "columns_number": 4,
+
   // true: the popup is displayed at caret position
   // false: it is displayed top-left of the view
   "at_caret": false,
+
+  // ------------ Popup color style ------------- //
+  
+  // Dark mode
+  "background_dark": "#354551",
+  "title_dark": "#edab26",
+  "symbols_dark": "#81c184",
+  "package_dark": "#d7bdff",
+  "b_dark": "#7bcf78",  // For the Ⓑ symbol representing both modes commands
+  "t_dark": "#aed7ff",  // For the Ⓣ symbol representing text-mode commands
+  "m_dark": "#ffcbd8",  // For the Ⓜ symbol representing math-mode commands
+  "insert_dark": "#807e44", // For the ⎀ symbol to insert the command in text
+
+  // Light mode
+  "background_light": "#f7fdff",
+  "title_light": "#edab26",
+  "symbols_light": "#4f7751",
+  "package_light": "#d7bdff",
+  "b_light": "#377f3b",  // For the Ⓑ symbol representing both modes commands
+  "t_light": "#2d2eda",  // For the Ⓣ symbol representing text-mode commands
+  "m_light": "#db3f43",  // For the Ⓜ symbol representing math-mode commands
+  "insert_light": "#75742b", // For the ⎀ symbol to insert the command in text
+
 }

@@ -1,10 +1,10 @@
 <snippet>
-    <content><![CDATA[- table: $1
-  package: ${2:latex}
-  type: ${3:math}
-  keywords:
-    - $4
-  symbols:
+    <content><![CDATA[  - table: $1
+    package: ${2:latex}
+    type: ${3:math}
+    keywords:
+      - $4
+    symbols:
     - $5 ]]></content>
     <!-- Optional: Tab trigger to activate the snippet -->
     <!-- <tabTrigger></tabTrigger> -->

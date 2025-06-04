@@ -6,20 +6,27 @@ import tempfile
 import subprocess
 import shlex
 from pathlib import Path
+from functools import partial
 
 # --------------------------------- Configuration ---------------------------------
 
 st_pkgs_dir = Path(__file__).resolve().parent.parent.parent
 INPUT_YAML = "symbols.yaml"
-PKG_ICON_DIR = Path("LaTeXSymbols/icons")
-USER_ICON_DIR = Path("User/LaTeXSymbols/icons")
-# USER_LOG_DIR = Path("User/LaTeXSymbols/log")
+PKG_NAME = "LaTeXSymbols"
+ICONS_DIR = "icons"
 METADATA_FILE = "symbols_data.json"
+
+pkg_icon_dir = os.path.join(PKG_NAME, ICONS_DIR)
+user_symbols_dir = os.path.join(st_pkgs_dir, "User", PKG_NAME)
+user_icon_dir = os.path.join("User", PKG_NAME, ICONS_DIR)
+user_icon_dir_fullpath = os.path.join(st_pkgs_dir, user_icon_dir)
+user_yaml_file = os.path.join(user_symbols_dir, INPUT_YAML)
+metadata_file = os.path.join(user_symbols_dir, METADATA_FILE)
+
 COLORS = ["white", "black"]
 ICON_SIZE = "64x64"
-DPI = os.getenv("DPI", "600")
-GAMMA = os.getenv("GAMMA", "1")
-
+DPI = "600"
+GAMMA = "1"
 
 TEMPLATE = r"""
 \documentclass[10pt]{{article}}
@@ -33,14 +40,17 @@ TEMPLATE = r"""
 \end{{document}}
 """
 
+# -------------------
+
+# Force real-time print output (for Sublime Text console)
+print = partial(print, flush=True)
+
 # ------------------------------------ Helpers ------------------------------------
 
 # Ensure output and log directories exist
-user_icon_fulldir = os.path.join(st_pkgs_dir, USER_ICON_DIR)
-Path(user_icon_fulldir).mkdir(parents=True, exist_ok=True)
+Path(user_icon_dir_fullpath).mkdir(parents=True, exist_ok=True)
 for color in COLORS:
-    print(Path(os.path.join(user_icon_fulldir,color)))
-    Path(os.path.join(user_icon_fulldir,color)).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(user_icon_dir_fullpath,color)).mkdir(parents=True, exist_ok=True)
 
 # ------------
 
@@ -74,17 +84,17 @@ def generate_icon(symbol, color):
     latex_command = f"${command}$" if symbol.get("type") == "math" else command
     filename = hash_filename(command, color, package)
     
-    output_path_ls = os.path.join(PKG_ICON_DIR, color, filename)
-    full_path_ls = os.path.join(st_pkgs_dir, output_path_ls)
-    output_path_user = os.path.join(USER_ICON_DIR, color, filename)
-    full_path_user = os.path.join(st_pkgs_dir, output_path_user)
+    output_path_ls = os.path.join(pkg_icon_dir, color, filename)
+    output_fullpath_ls = os.path.join(st_pkgs_dir, output_path_ls)
+    output_path_user = os.path.join(user_icon_dir, color, filename)
+    output_fullpath_user = os.path.join(st_pkgs_dir, output_path_user)
     
-    if os.path.isfile(full_path_ls):
+    if os.path.isfile(output_fullpath_ls):
         return output_path_ls, "exists"
-    elif os.path.isfile(full_path_user):
+    elif os.path.isfile(output_fullpath_user):
         return output_path_user, "exists"
 
-    output_path = full_path_user
+    output_path = output_fullpath_user
     
     with tempfile.TemporaryDirectory() as tmpdir:
         basename = "symbol"
@@ -132,7 +142,7 @@ def generate_icon(symbol, color):
                                 "-resize", f'{ICON_SIZE}',
                                 "-extent", f'{ICON_SIZE}',
                                 "-background", "transparent",
-                                "-gravity", "center",
+                                "-gravity", "South", #"center",
                                 f'{output_path}',
                                 ]
                             )
@@ -148,12 +158,8 @@ def generate_icon(symbol, color):
 
 def main():
 
-    user_symbols_dir = os.path.join(st_pkgs_dir, "User", "LaTeXSymbols")
-    user_symbols_file = os.path.join(user_symbols_dir, INPUT_YAML)
-    metadata_file = os.path.join(user_symbols_dir, METADATA_FILE)
-
-    if os.path.exists(user_symbols_file):
-        yaml_file = user_symbols_file
+    if os.path.exists(user_yaml_file):
+        yaml_file = user_yaml_file
     else:
         print(f"❌ No user symbol file.")
         return
@@ -218,7 +224,7 @@ def main():
         with open(metadata_file, "w", encoding="utf-8") as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
 
-        print(f"\n✅ Done. {new_icon} new entries generated. \n Data saved to {metadata_file}.")
+        print(f"\n✅ Done. {new_icon} new icons generated. \n Data saved to {metadata_file}.")
 
     except Exception as e:
         print(f"""❌ There was an error when updating the data:\n{e}\n 

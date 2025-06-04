@@ -41,18 +41,22 @@ LaTeX Symbols is designed to let the user customize the symbols list. For that:
 of the original `symbols.yaml` file, put in the `User/LaTeXSymbols/` folder. 
 
 2. Add symbols, modify the keywords, comment useless tables, etc. directly in the new
-`symbols.yaml` file. The yaml syntax should be sufficiently self-explanatory. A `Snippet:
-table for symbols.yaml` is included with the package to facilitate the procedure. Check
-that the yaml syntax is respected (be careful about spaces).
+`symbols.yaml` file. The YAML syntax is intended to be self-explanatory. A `Snippet:
+table for symbols.yaml` is included with the package to facilitate the procedure (use at
+the beginning of line). Check that the yaml syntax is respected (be careful about
+spaces).
 
 3. Use the command-palette entry `LaTeXSymbols: Update database and icons` to update the
 database. For new symbols, the compilation process to generate thumbnails is run in the
 background and can be slow: check the console.
 
+This requires (for new symbols):
+- `dvipng` (usually coming with Tex distribution)
+- `mogrify`(coming with [`ImageMagick`](https://imagemagick.org/index.php))
 
-### License
+## License
 
-This plugin is licensed under the MIT license. In particular, it is provided "as is",
+This package is licensed under the MIT license. In particular, it is provided "as is",
 without warranty of any kind!
 
 
@@ -64,11 +68,11 @@ request!
 
 ## Acknowledgements
 
-LaTeX Symbols for Sublime Text is adapted from @wookayin's [Alfred]
-(https://www.alfredapp.com/) workflow [alfred-latex-symbols-workflow]
-(https://github.com/wookayin/alfred-latex-symbols-workflow). Symbols were taken from
-there and completed (a bit) thanks to S. Pakin's [Comprehensive LaTeX Symbol List]
-(https://ctan.org/pkg/comprehensive).
+LaTeX Symbols for Sublime Text is adapted from [wookayin](https://github.com/wookayin/)'s
+[Alfred](https://www.alfredapp.com/) workflow 
+[alfred-latex-symbols-workflow](https://github.com/wookayin/alfred-latex-symbols-workflow). 
+Symbols were taken from there and completed (a bit) thanks to S. Pakin's 
+[Comprehensive LaTeX Symbol List](https://ctan.org/pkg/comprehensive).
 
 alfred-latex-symbols-workflow is © 2015-2021 Jongwook Choi under the MIT License.
 

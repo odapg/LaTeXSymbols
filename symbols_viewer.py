@@ -12,28 +12,49 @@ from sublime_plugin import TextCommand
 
 # ---------------------------------- Style sheets ----------------------------------
 
-DARK_STYLE = """<style>
-html {background-color: #354551; padding: 3px; border: 1px solid white; margin-bottom: 1;}
-h1 {color: #edab26; font-size: 1.2em; text-align: center; margin-top: 0; margin-bottom: 1;}
-h3 {color: #d7bdff; font-size: 1.1em; text-align: left; margin-top: 0; margin-bottom: 1;}
-a { text-decoration: none; }
-type-b { color: #7bcf78; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
-type-t { color: #aed7ff; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
-type-m { color: #ffcbd8; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
-insert { color: #807e44;}
-.latex-sym { text-align: left; color: #81c184; }
+ls_settings = sublime.load_settings('LaTeXSymbols.sublime-settings')
+
+background_dark = ls_settings.get('background_dark', '#354551')
+title_dark = ls_settings.get('title_dark', '#edab26')
+symbols_dark = ls_settings.get('symbols_dark', '#81c184')
+package_dark = ls_settings.get('package_dark', '#d7bdff')
+b_dark = ls_settings.get('b_dark', '#7bcf78')
+t_dark = ls_settings.get('t_dark', '#aed7ff')
+m_dark = ls_settings.get('m_dark', '#ffcbd8')
+insert_dark = ls_settings.get('insert_dark', '#807e44')
+
+background_light = ls_settings.get('background_light', '#f7fdff')
+title_light = ls_settings.get('title_light', '#edab26')
+symbols_light = ls_settings.get('symbols_light', '#4f7751')
+package_light = ls_settings.get('package_light', '#d7bdff')
+b_light = ls_settings.get('b_light', '#377f3b')
+t_light = ls_settings.get('t_light', '#2d2eda')
+m_light = ls_settings.get('m_light', '#db3f43')
+insert_light = ls_settings.get('insert_light', '#75742b')
+
+
+DARK_STYLE = f"""<style>
+html {{background-color: {background_dark}; padding: 3px; border: 1px solid white; margin-bottom: 1;}}
+h1 {{color: {title_dark}; font-size: 1.2em; text-align: center; margin-top: 0; margin-bottom: 1;}}
+h3 {{color: {package_dark}; font-size: 1.1em; text-align: left; margin-top: 0; margin-bottom: 1;}}
+a {{ text-decoration: none; }}
+type-b {{ color: {b_dark}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
+type-t {{ color: {t_dark}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
+type-m {{ color: {m_dark}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
+insert {{ color: {insert_dark};}}
+.latex-sym {{ text-align: left; color: {symbols_dark}; }}
 </style>"""
 
-LIGHT_STYLE = """<style>
-html {background-color: #f0fff6; padding: 3px; border: 1px solid white; margin-bottom: 1;}
-h1 {color: #edab26; font-size: 1.2em; text-align: center; margin-top: 0; margin-bottom: 1;}
-h3 {color: #d7bdff; font-size: 1.1em; text-align: left; margin-top: 0; margin-bottom: 1;}
-a { text-decoration: none; }
-type-b { color: #00d542; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
-type-t { color: #2d2eda; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
-type-m { color: #db3f43; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }
-insert { color: #75742b;}
-.latex-sym { text-align: left; color: #4f7751; }
+LIGHT_STYLE = f"""<style>
+html {{background-color: {background_light}; padding: 3px; border: 1px solid white; margin-bottom: 1;}}
+h1 {{color: {title_light}; font-size: 1.2em; text-align: center; margin-top: 0; margin-bottom: 1;}}
+h3 {{color: {package_dark}; font-size: 1.1em; text-align: left; margin-top: 0; margin-bottom: 1;}}
+a {{ text-decoration: none; }}
+type-b {{ color: {b_light}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
+type-t {{ color: {t_light}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
+type-m {{ color: {m_light}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
+insert {{ color: {insert_light};}}
+.latex-sym {{ text-align: left; color: {symbols_light}; }}
 </style>"""
 
 
@@ -341,14 +362,15 @@ class RunIconGeneratorThread(threading.Thread):
 
             output = ""
             for line in process.stdout:
-                print("[icon-generator] " + line.strip())
+                print("[LaTeXSymbols] " + line.strip())
                 output += line
 
             process.wait()
             if process.returncode != 0:
-                print(f"[icon-generator] Process exited with code {process.returncode}")
+                print(f"[LaTeXSymbols] Process exited with code {process.returncode}")
             else:
-                print("[icon-generator] ✅ Done")
+                return
+                # print("[LaTeXSymbols] ✅ Done")
 
         except Exception as e:
             sublime.error_message("Error running script:\n" + str(e))
