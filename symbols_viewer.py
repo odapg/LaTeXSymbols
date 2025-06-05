@@ -94,7 +94,7 @@ def generate_html(grouped):
     if max_per_row < 2 or max_per_row > 5:
         max_per_row = 4
 
-    theme = ls_settings.get('background_color')
+    theme = ls_settings.get('popup_theme')
     if theme == "dark":
         color = "white"
         STYLE = DARK_STYLE
@@ -117,7 +117,6 @@ def generate_html(grouped):
                 name = s["name"]
                 ws = "&nbsp;" * (21 - len(name)) if j < max_per_row -1 else ""
                 icon_path = os.path.join(sublime.packages_path(), s["path"][color])
-                print(icon_path)
                 encoded = image_to_base64(icon_path)
                 if s["type"] == "both":
                     type = "<type-b>Ⓑ</type-b>"
@@ -181,8 +180,13 @@ class SymbolSearchSession:
     def update_popup(self, filter_text):
 
         def matches(s):
-            if filter_text in s.get("name", "").lower(): return True
-            if filter_text in s.get("package", "").lower(): return True
+            if (
+                filter_text in s.get("name", "").lower() 
+                or filter_text.strip() == s.get("name", "").lower().lstrip('\\')
+                ):
+                return True
+            if filter_text in s.get("package", "").lower(): 
+                return True
             keywords = s.get("keywords", [])
             if isinstance(keywords, list):
                 for kw in keywords:
@@ -214,7 +218,7 @@ class SymbolSearchSession:
 
         else:
             sublime.set_clipboard(href)
-            sublime.status_message(f"LaTeX symbol copied: {href}")
+            sublime.status_message(f"LaTeX symbol copied to the clipboard: {href}")
 
 # -------------
 
@@ -253,7 +257,7 @@ class LiveFilterLatexSymbolsCommand(sublime_plugin.WindowCommand):
 # ------------ Command to display symbols corresponding to a keyword --------------
 
 class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
-    def run(self, keyword):
+    def run(self, ls_keyword):
         view = self.window.active_view()
         self.session = SymbolSearchSession(view)
 
@@ -261,7 +265,7 @@ class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
             keywords = symbol.get("keywords", [])
             if isinstance(keywords, list):
                 lower_keywords = [kw.lower() for kw in keywords if isinstance(kw, str)]
-                return keyword.lower() in lower_keywords
+                return ls_keyword.lower() in lower_keywords
             return False
 
         filtered = [s for s in self.session.symbols if matches(s)]
@@ -280,10 +284,10 @@ class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
     def input(self, args):
         if "keyword" in args:
             return None
-        return KeywordInputHandler()
+        return LsKeywordInputHandler()
 
 
-class KeywordInputHandler(sublime_plugin.ListInputHandler):
+class LsKeywordInputHandler(sublime_plugin.ListInputHandler):
     def list_items(self):
         symbols = load_symbols()
         keywords = set()
@@ -299,12 +303,12 @@ class KeywordInputHandler(sublime_plugin.ListInputHandler):
 # ------------ Command to display symbols corresponding to a package --------------
 
 class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
-    def run(self, package):
+    def run(self, ls_package):
         view = self.window.active_view()
         self.session = SymbolSearchSession(view)
 
         def matches(symbol):
-            return symbol.get("package", "").lower() == package.lower()
+            return symbol.get("package", "").lower() == ls_package.lower()
 
         filtered = [s for s in self.session.symbols if matches(s)]
 
@@ -322,10 +326,10 @@ class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
     def input(self, args):
         if "package" in args:
             return None
-        return PackageInputHandler()
+        return LsPackageInputHandler()
 
 
-class PackageInputHandler(sublime_plugin.ListInputHandler):
+class LsPackageInputHandler(sublime_plugin.ListInputHandler):
     def list_items(self):
         symbols = load_symbols()
         packages = set()

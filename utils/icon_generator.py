@@ -16,12 +16,10 @@ PKG_NAME = "LaTeXSymbols"
 ICONS_DIR = "icons"
 METADATA_FILE = "symbols_data.json"
 
-pkg_icon_dir = os.path.join(PKG_NAME, ICONS_DIR)
-user_symbols_dir = os.path.join(st_pkgs_dir, "User", PKG_NAME)
 user_icon_dir = os.path.join("User", PKG_NAME, ICONS_DIR)
-user_icon_dir_fullpath = os.path.join(st_pkgs_dir, user_icon_dir)
-user_yaml_file = os.path.join(user_symbols_dir, INPUT_YAML)
-metadata_file = os.path.join(user_symbols_dir, METADATA_FILE)
+user_icon_dir_fullpath = os.path.join(st_pkgs_dir, "User", PKG_NAME, ICONS_DIR)
+user_yaml_file = os.path.join(st_pkgs_dir, "User", PKG_NAME, INPUT_YAML)
+metadata_file = os.path.join(st_pkgs_dir, "User", PKG_NAME, METADATA_FILE)
 
 COLORS = ["white", "black"]
 ICON_SIZE = "64x64"
@@ -42,15 +40,17 @@ TEMPLATE = r"""
 
 # -------------------
 
-# Force real-time print output (for Sublime Text console)
+# Force real-time print output (for ST console)
 print = partial(print, flush=True)
 
 # ------------------------------------ Helpers ------------------------------------
 
-# Ensure output and log directories exist
+# Ensure user directories exist
 Path(user_icon_dir_fullpath).mkdir(parents=True, exist_ok=True)
 for color in COLORS:
     Path(os.path.join(user_icon_dir_fullpath,color)).mkdir(parents=True, exist_ok=True)
+# user_log_dir = os.path.join(st_pkgs_dir, "User", PKG_NAME, "Logs")
+# Path(user_log_dir).mkdir(parents=True, exist_ok=True)
 
 # ------------
 
@@ -71,7 +71,7 @@ def run_command(command, log_path=None):
     )
     if result.returncode != 0 and log_path:
         with open(log_path, "wb") as f:
-            f.write(result.stdout + b"\n" + result.stderr)
+            f.write(bytes(result.stdout + "\n" + result.stderr, 'utf-8'))
     return result.returncode == 0
 
 
@@ -84,23 +84,23 @@ def generate_icon(symbol, color):
     latex_command = f"${command}$" if symbol.get("type") == "math" else command
     filename = hash_filename(command, color, package)
     
-    output_path_ls = os.path.join(pkg_icon_dir, color, filename)
-    output_fullpath_ls = os.path.join(st_pkgs_dir, output_path_ls)
-    output_path_user = os.path.join(user_icon_dir, color, filename)
-    output_fullpath_user = os.path.join(st_pkgs_dir, output_path_user)
+    icon_path_ls = os.path.join(PKG_NAME, ICONS_DIR, color, filename)
+    icon_fullpath_ls = os.path.join(st_pkgs_dir, icon_path_ls)
+    icon_path_user = os.path.join(user_icon_dir, color, filename)
+    icon_fullpath_user = os.path.join(st_pkgs_dir, icon_path_user)
     
-    if os.path.isfile(output_fullpath_ls):
-        return output_path_ls, "exists"
-    elif os.path.isfile(output_fullpath_user):
-        return output_path_user, "exists"
+    if os.path.isfile(icon_fullpath_ls):
+        return icon_path_ls, "exists"
+    elif os.path.isfile(icon_fullpath_user):
+        return icon_path_user, "exists"
 
-    output_path = output_fullpath_user
+    output_path = icon_fullpath_user
     
     with tempfile.TemporaryDirectory() as tmpdir:
         basename = "symbol"
         tex_path = Path(tmpdir) / f"{basename}.tex"
         dvi_path = Path(tmpdir) / f"{basename}.dvi"
-        # log_path = USER_LOG_DIR / f"{filename}.log"
+        # log_path = os.path.join(user_log_dir, f"{basename}.log")
 
         packages = ""
         if package and package.lower() != "latex":
@@ -118,8 +118,8 @@ def generate_icon(symbol, color):
                                 f"-output-directory={tmpdir}",
                                 tex_path
                               ],
+                            # log_path=log_path
                             )
-                    # log_path=log_path
         if not success or not dvi_path.exists():
             return None, "latex_failed"
 
@@ -129,11 +129,11 @@ def generate_icon(symbol, color):
                                 "-T", "tight",
                                 "-D", f"{DPI}",
                                 "--gamma", f"{GAMMA}",
-                                "-o", f"{output_path}",
+                                "-o", f'{output_path}',
                                 f"{dvi_path}"
-                                ]
+                                ],
+                             # log_path=log_path,
                             )
-                     # log_path=log_path,
         if not success:
             return None, "dvipng_failed"
 
@@ -145,13 +145,13 @@ def generate_icon(symbol, color):
                                 "-gravity", "South", #"center",
                                 f'{output_path}',
                                 ]
+                            # log_path=log_path,
                             )
-                     # log_path=log_path,
         if not success:
             output_path.unlink(missing_ok=True)
             return None, "mogrify_failed"
 
-    return output_path_user, "generated"
+    return icon_path_user, "generated"
 
 
 # -------------------------------- Main Command --------------------------------

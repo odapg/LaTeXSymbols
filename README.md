@@ -8,9 +8,10 @@ a LaTeX symbol. It opens an input panel to search symbols by name/keyword/packag
 
 ## Manual installation
 
-1. Clone or download this repository using the green `Clone or download` button. 
+1. Clone or download this repository using the `Clone or download` button. 
 
-2. Move the `LaTeXSymbols` folder to your Sublime Text's `Packages` folder. 
+2. Move the folder to your Sublime Text's `Packages` folder. Make sure it is called 
+`LaTeXSymbols`.
 
 3. Restart Sublime Text.
 
@@ -51,8 +52,8 @@ database. For new symbols, the compilation process to generate thumbnails is run
 background and can be slow: check the console.
 
 This requires (for new symbols):
-- `dvipng` (usually coming with Tex distribution)
-- `mogrify`(coming with [`ImageMagick`](https://imagemagick.org/index.php))
+- `dvipng` (usually coming with Tex distributions)
+- `mogrify` (coming with [`ImageMagick`](https://imagemagick.org/index.php))
 
 ## License
 
