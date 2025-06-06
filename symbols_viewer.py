@@ -4,11 +4,10 @@ import os
 import shutil
 import json
 import base64
-import subprocess
 import threading
 from collections import OrderedDict
 from sublime_plugin import TextCommand
-
+from .utils.icon_generator import ls_refresh_database
 
 # ---------------------------------- Style sheets ----------------------------------
 
@@ -348,36 +347,10 @@ class RunIconGeneratorThread(threading.Thread):
         self.window = window
 
     def run(self):
-        LS_dir = os.path.join(sublime.packages_path(), "LaTeXSymbols") 
-        script_path = os.path.join(LS_dir, "utils", "icon_generator.py")
-
-        if not os.path.isfile(script_path):
-            sublime.error_message("Script not found:\n" + script_path)
-            return
-
         try:
-            process = subprocess.Popen(
-                ["python3", script_path],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
-                cwd=LS_dir
-            )
-
-            output = ""
-            for line in process.stdout:
-                print("[LaTeXSymbols] " + line.strip())
-                output += line
-
-            process.wait()
-            if process.returncode != 0:
-                print(f"[LaTeXSymbols] Process exited with code {process.returncode}")
-            else:
-                return
-                # print("[LaTeXSymbols] ✅ Done")
-
+            ls_refresh_database(),
         except Exception as e:
-            sublime.error_message("Error running script:\n" + str(e))
+            sublime.error_message([LaTeXSymbols] "Error running script:\n" + str(e))
 
 
 class LatexSymbolsRefreshCommand(sublime_plugin.WindowCommand):

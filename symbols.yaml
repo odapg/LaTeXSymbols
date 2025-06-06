@@ -168,7 +168,6 @@ tables:
       - \m{S}
       - \m{z}
   # Table 8: Letters Used to Typeset Vietnamese
-  # TODO: get vntex
   - table: 8
     package: vntex
     type: text
@@ -180,7 +179,7 @@ tables:
       - \UHORN
       - \uhorn
   # Table 8: Punctuation Marks Not Found in OT1
-  - table: 8
+  - table: 9
     package: latex
     type: text
     keywords: punctuation
@@ -365,79 +364,82 @@ tables:
       - \textglobrise
       - \textrtaill
   # # Table 13: tipx Phonetic Symbols
-  # # - package: tipx
-  # #   textmode:
-  # #     - \textaolig
-  # #     - \texthtbardotlessjvar
-  # #     - \textrthooklong
-  # #     - \textbenttailyogh
-  # #     - \textinvomega
-  # #     - \textscaolig
-  # #     - \textbktailgamma
-  # #     - \textinvsca
-  # #     - \textscdelta
-  # #     - \textctinvglotstop
-  # #     - \textinvscripta
-  # #     - \textscf
-  # #     - \textctjvar
-  # #     - \textlfishhookrlig
-  # #     - \textsck
-  # #     - \textctstretchc
-  # #     - \textlhookfour
-  # #     - \textscm
-  # #     - \textctstretchcvar
-  # #     - \textlhookp
-  # #     - \textscp
-  # #     - \textctturnt
-  # #     - \textlhti
-  # #     - \textscq
-  # #     - \textdblig
-  # #     - \textlooptoprevesh
-  # #     - \textspleftarrow
-  # #     - \textdoublebarpipevar
-  # #     - \textnrleg
-  # #     - \textstretchcvar
-  # #     - \textdoublepipevar
-  # #     - \textObullseye
-  # #     - \textsubdoublearrow
-  # #     - \textdownfullarrow
-  # #     - \textpalhooklong
-  # #     - \textsubrightarrow
-  # #     - \textfemale
-  # #     - \textpalhookvar
-  # #     - \textthornvari
-  # #     - \textfrbarn
-  # #     - \textpipevar
-  # #     - \textthornvarii
-  # #     - \textfrhookd
-  # #     - \textqplig
-  # #     - \textthornvariii
-  # #     - \textfrhookdvar
-  # #     - \textrectangle
-  # #     - \textthornvariv
-  # #     - \textfrhookt
-  # #     - \textretractingvar
-  # #     - \textturnglotstop
-  # #     - \textfrtailgamma
-  # #     - \textrevscl
-  # #     - \textturnsck
-  # #     - \textglotstopvari
-  # #     - \textrevscr
-  # #     - \textturnscu
-  # #     - \textglotstopvarii
-  # #     - \textrhooka
-  # #     - \textturnthree
-  # #     - \textglotstopvariii
-  # #     - \textrhooke
-  # #     - \textturntwo
-  # #     - \textgrgamma
-  # #     - \textrhookepsilon
-  # #     - \textuncrfemale
-  # #     - \textheng
-  # #     - \textrhookopeno
-  # #     - \textupfullarrow
-  # #     - \texthmlig
-  # #     - \textrtailhth
+  # - table: 13
+  # package: tipx
+  # type: text
+  # keywords: phonetic
+  # symbols: 
+  #   - \textaolig
+  #   - \texthtbardotlessjvar
+  #   - \textrthooklong
+  #   - \textbenttailyogh
+  #   - \textinvomega
+  #   - \textscaolig
+  #   - \textbktailgamma
+  #   - \textinvsca
+  #   - \textscdelta
+  #   - \textctinvglotstop
+  #   - \textinvscripta
+  #   - \textscf
+  #   - \textctjvar
+  #   - \textlfishhookrlig
+  #   - \textsck
+  #   - \textctstretchc
+  #   - \textlhookfour
+  #   - \textscm
+  #   - \textctstretchcvar
+  #   - \textlhookp
+  #   - \textscp
+  #   - \textctturnt
+  #   - \textlhti
+  #   - \textscq
+  #   - \textdblig
+  #   - \textlooptoprevesh
+  #   - \textspleftarrow
+  #   - \textdoublebarpipevar
+  #   - \textnrleg
+  #   - \textstretchcvar
+  #   - \textdoublepipevar
+  #   - \textObullseye
+  #   - \textsubdoublearrow
+  #   - \textdownfullarrow
+  #   - \textpalhooklong
+  #   - \textsubrightarrow
+  #   - \textfemale
+  #   - \textpalhookvar
+  #   - \textthornvari
+  #   - \textfrbarn
+  #   - \textpipevar
+  #   - \textthornvarii
+  #   - \textfrhookd
+  #   - \textqplig
+  #   - \textthornvariii
+  #   - \textfrhookdvar
+  #   - \textrectangle
+  #   - \textthornvariv
+  #   - \textfrhookt
+  #   - \textretractingvar
+  #   - \textturnglotstop
+  #   - \textfrtailgamma
+  #   - \textrevscl
+  #   - \textturnsck
+  #   - \textglotstopvari
+  #   - \textrevscr
+  #   - \textturnscu
+  #   - \textglotstopvarii
+  #   - \textrhooka
+  #   - \textturnthree
+  #   - \textglotstopvariii
+  #   - \textrhooke
+  #   - \textturntwo
+  #   - \textgrgamma
+  #   - \textrhookepsilon
+  #   - \textuncrfemale
+  #   - \textheng
+  #   - \textrhookopeno
+  #   - \textupfullarrow
+  #   - \texthmlig
+  #   - \textrtailhth
   # # Table 33: textcomp Currency Symbols
   - table: 33
     package: textcomp
@@ -462,8 +464,12 @@ tables:
       - \textflorin
       - \textsterling
   # # Table 34: marvosym Currency Symbols
-  # - package: marvosym
-  #   textmode:
+  # - table: 34
+  #   package: marvosym
+  #   type: text
+  #   keywords:
+  #     - currency
+  #   symbols:
   #     - \Denarius
   #     - \EUR
   #     - \EURdig
@@ -475,13 +481,21 @@ tables:
   #     - \EyesDollar
   #     - \Shilling
   # # Table 36: wasysym Currency Symbols
-  # - package: wasysym
-  #   textmode:
+  # - table: 36
+  #   package: wasysym
+  #   type: text
+  #   keywords:
+  #     - currency
+  #   symbols:
   #     - \cent
   #     - \currency
   # # Table 42: textcomp Legal Symbols
-  # - package: textcomp
-  #   textmode:
+  # - table: 42
+  #   package: textcomp
+  #   type: text
+  #   keywords:
+  #     - legal
+  #   symbols:
   #     - \textcircledP
   #     - \textcopyright
   #     - \textservicemark
@@ -489,6 +503,12 @@ tables:
   #     - \textregistered
   #     - \texttrademark
   # # Table 47: Miscellaneous textcomp Symbols
+  # - table: 47
+  #   package: textcomp
+  #   type: text
+  #   keywords:
+  #     - miscellaneous
+  #   symbols:
   #     - \textasteriskcentered
   #     - \textordfeminine
   #     - \textbardbl
@@ -523,8 +543,11 @@ tables:
   #     - \texttwelveudash
   #     - \textopenbullet
   # # Table 48: Miscellaneous wasysym Text-mode Symbols
-  # - package: wasysym
-  #   textmode:
+  # - table: 48
+  #   package: wasysym
+  #   type: text
+  #   keywords:
+  #     - miscellaneous
   #     - \permil
   # ############################
   # ### Mathematical symbols ###
@@ -842,6 +865,19 @@ tables:
       - \iiint
       - \iiiint
       - \idotsint
+  # # Table 82: wasysym Variable-sized MathOperators
+  - table: 82
+    package: wasysym
+    type: math
+    keywords:
+      - operators
+      - variable-sized
+    symbols:
+      - \int
+      - \iint
+      - \iiint
+      - \oint
+      - \oiint
   # Table 85: esint Variable-sized MathOperators
   - table: 85
     package: esint
@@ -977,6 +1013,19 @@ tables:
     symbols: 
       - \inplus
       - \niplus
+  # # Table 102: wasysym Binary Relations
+  - table: 102
+    package: wasysym
+    type: math
+    keywords:
+      - binary
+      - relations
+    symbols:
+      - \invneg
+      - \leadsto
+      - \wasypropto
+      - \Join
+      - \logof
   # # Table 125: Subset and Superset Relations
   - table: 125
     package: latex
@@ -1016,6 +1065,16 @@ tables:
       - \varsupsetneqq
       - \Subset
       - \supsetneq
+# # Table 128: wasysym Subset and Superset Relations
+  - table: 128
+    package: wasysym
+    type: math
+    keywords:
+      - subset
+      - superset
+    symbols: 
+      - \sqsubset
+      - \sqsupset
   # # Table 136: Inequalities
   - table: 136
     package: latex
@@ -1073,6 +1132,15 @@ tables:
       - \gtrapprox
       - \lessdot
       - \lvertneqq
+  # # Table 138: wasysym Inequalities
+  - table: 138
+    package: wasysym
+    type: math
+    keywords:
+      - inequalities
+    symbols:
+      - \apprge
+      - \apprle
   # # Table 140: mathabx Inequalities
   - table: 140
     package: mathabx
@@ -1686,6 +1754,14 @@ tables:
       - \dotsm
       - \dotsc
       - \dotso
+# # Table 308: wasysym Dots
+  - table: 308
+    package: wasysym
+    type: math
+    keywords:
+      - dots
+    symbols:
+      - \wasytherefore
   # # Table 312: mathdots Dots
   - table: 312
     package: mathdots
@@ -1750,6 +1826,18 @@ tables:
       - \blacktriangle
       - \measuredangle
       - \vartriangle
+  # # Table 336: Miscellaneous wasysym Math Symbols
+  - table: 336
+    package: wasysym
+    type: math
+    keywords:
+      - miscellaneous
+      - symbols
+    symbols: 
+      - \Box
+      - \Diamond
+      - \mho
+      - \varangle
   # # Table 344: Miscellaneous textcomp Text-mode Math Symbols
   - table: 344
     package: textcomp
@@ -1933,7 +2021,7 @@ tables:
       - \ohm
   # # Table 357: wasysym Astronomical Symbols
   # - table: 357
-  #   package: latex
+  #   package: wasysym
   #   type: both
   #   keywords:
   #     - astronomical
@@ -1967,7 +2055,12 @@ tables:
   #     - \ascnode
   #     - \descnode
   #     - \vernal
-  #   textmode:
+  # - table: 357b
+  #   package: wasysym
+  #   type: text
+  #   keywords:
+  #     - astronomical
+  #   symbols:
   #     - \conjunction
   #     - \opposition
   # # Table 358: marvosym Astronomical Symbols

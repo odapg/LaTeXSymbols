@@ -1,16 +1,19 @@
+import sublime
+import sublime_plugin
 import os
 import yaml
 import hashlib
 import json
 import tempfile
 import subprocess
-import shlex
+# import shlex
 from pathlib import Path
 from functools import partial
 
 # --------------------------------- Configuration ---------------------------------
 
-st_pkgs_dir = Path(__file__).resolve().parent.parent.parent
+# st_pkgs_dir = Path(__file__).resolve().parent.parent.parent
+st_pkgs_dir = sublime.packages_path()
 INPUT_YAML = "symbols.yaml"
 PKG_NAME = "LaTeXSymbols"
 ICONS_DIR = "icons"
@@ -20,6 +23,7 @@ user_icon_dir = os.path.join("User", PKG_NAME, ICONS_DIR)
 user_icon_dir_fullpath = os.path.join(st_pkgs_dir, "User", PKG_NAME, ICONS_DIR)
 user_yaml_file = os.path.join(st_pkgs_dir, "User", PKG_NAME, INPUT_YAML)
 metadata_file = os.path.join(st_pkgs_dir, "User", PKG_NAME, METADATA_FILE)
+user_log_dir = os.path.join(st_pkgs_dir, "User", PKG_NAME, "Logs")
 
 COLORS = ["white", "black"]
 ICON_SIZE = "64x64"
@@ -44,15 +48,6 @@ TEMPLATE = r"""
 print = partial(print, flush=True)
 
 # ------------------------------------ Helpers ------------------------------------
-
-# Ensure user directories exist
-Path(user_icon_dir_fullpath).mkdir(parents=True, exist_ok=True)
-for color in COLORS:
-    Path(os.path.join(user_icon_dir_fullpath,color)).mkdir(parents=True, exist_ok=True)
-# user_log_dir = os.path.join(st_pkgs_dir, "User", PKG_NAME, "Logs")
-# Path(user_log_dir).mkdir(parents=True, exist_ok=True)
-
-# ------------
 
 def hash_filename(command, color, package=None):
     key = f"{command}-{color}-{package or 'latex'}"
@@ -100,7 +95,7 @@ def generate_icon(symbol, color):
         basename = "symbol"
         tex_path = Path(tmpdir) / f"{basename}.tex"
         dvi_path = Path(tmpdir) / f"{basename}.dvi"
-        # log_path = os.path.join(user_log_dir, f"{basename}.log")
+        log_path = os.path.join(user_log_dir, f"{filename}.log")
 
         packages = ""
         if package and package.lower() != "latex":
@@ -114,7 +109,7 @@ def generate_icon(symbol, color):
 
         # Compile LaTeX
         success = run_command([ "latex",
-                                "-interaction=batchmode",
+                                "-interaction=nonstopmode",
                                 f"-output-directory={tmpdir}",
                                 tex_path
                               ],
@@ -156,13 +151,21 @@ def generate_icon(symbol, color):
 
 # -------------------------------- Main Command --------------------------------
 
-def main():
+# def main():
+def ls_refresh_database():
 
     if os.path.exists(user_yaml_file):
         yaml_file = user_yaml_file
     else:
         print(f"❌ No user symbol file.")
         return
+
+    # Ensure user directories exist
+    Path(user_icon_dir_fullpath).mkdir(parents=True, exist_ok=True)
+    for color in COLORS:
+        Path(os.path.join(user_icon_dir_fullpath,color)).mkdir(parents=True, exist_ok=True)
+    # Path(user_log_dir).mkdir(parents=True, exist_ok=True)
+
     try:
         with open(yaml_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
@@ -224,7 +227,7 @@ def main():
         with open(metadata_file, "w", encoding="utf-8") as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
 
-        print(f"\n✅ Done. {new_icon} new icons generated. \n Data saved to {metadata_file}.")
+        print(f"\n✅ Done. {new_icon} new icons generated. \nData saved to {metadata_file}.")
 
     except Exception as e:
         print(f"""❌ There was an error when updating the data:\n{e}\n 
@@ -232,5 +235,5 @@ def main():
 
 # ------------------------
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
