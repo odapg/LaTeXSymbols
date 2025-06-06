@@ -9,7 +9,7 @@ from collections import OrderedDict
 from sublime_plugin import TextCommand
 from .utils.icon_generator import ls_refresh_database
 
-# ---------------------------------- Style sheets ----------------------------------
+# ------------------------------- Style sheets -------------------------------
 
 ls_settings = sublime.load_settings('LaTeXSymbols.sublime-settings')
 
@@ -211,7 +211,7 @@ class SymbolSearchSession:
     def on_click(self, href):
         if href.startswith("ins-"):
             self.view.run_command('ls_insert_in_view', 
-                        {'text': href[4:]})
+                                 {'text': href[4:]})
             self.view.hide_popup()
             self.view.window().run_command("hide_panel", {"panel": "input"})
 
@@ -228,7 +228,7 @@ class SymbolSearchSession:
         pass
 
 
-# -------------  Command to display symbols and start filtering ---------------------
+# -------------  Command to display symbols and start filtering --------------
 
 class LiveFilterLatexSymbolsCommand(sublime_plugin.WindowCommand):
 
@@ -253,7 +253,7 @@ class LiveFilterLatexSymbolsCommand(sublime_plugin.WindowCommand):
         self.window.active_view().hide_popup()
 
 
-# ------------ Command to display symbols corresponding to a keyword --------------
+# ----------- Command to display symbols corresponding to a keyword ------------
 
 class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
     def run(self, ls_keyword):
@@ -285,6 +285,9 @@ class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
             return None
         return LsKeywordInputHandler()
 
+    def input_description(self):
+        return "[LaTeXSymbols] Keywords"
+
 
 class LsKeywordInputHandler(sublime_plugin.ListInputHandler):
     def list_items(self):
@@ -298,8 +301,11 @@ class LsKeywordInputHandler(sublime_plugin.ListInputHandler):
                         keywords.add(kw)
         return sorted(keywords)
 
+    def placeholder(self):
+        return ("Select a keyword")
 
-# ------------ Command to display symbols corresponding to a package --------------
+
+# ---------- Command to display symbols corresponding to a package -----------
 
 class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
     def run(self, ls_package):
@@ -327,6 +333,9 @@ class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
             return None
         return LsPackageInputHandler()
 
+    def input_description(self):
+        return "[LaTeXSymbols] Packages"
+
 
 class LsPackageInputHandler(sublime_plugin.ListInputHandler):
     def list_items(self):
@@ -338,8 +347,11 @@ class LsPackageInputHandler(sublime_plugin.ListInputHandler):
                 packages.add(pkg.strip())
         return sorted(packages)
 
+    def placeholder(self):
+        return ("Select a package")
 
-# -----------------------------  Refresh database  ----------------------------------
+
+# --------------------------  Refresh database  -------------------------------
 
 class RunIconGeneratorThread(threading.Thread):
     def __init__(self, window):
@@ -350,7 +362,7 @@ class RunIconGeneratorThread(threading.Thread):
         try:
             ls_refresh_database(),
         except Exception as e:
-            sublime.error_message([LaTeXSymbols] "Error running script:\n" + str(e))
+            sublime.error_message("[LaTeXSymbols] Error running script:\n" + str(e))
 
 
 class LatexSymbolsRefreshCommand(sublime_plugin.WindowCommand):
@@ -362,7 +374,7 @@ class LatexSymbolsRefreshCommand(sublime_plugin.WindowCommand):
         return True
 
 
-# ----------------- Command to customize the symbols.yaml file -------------------
+# --------------- Command to customize the symbols.yaml file -----------------
 
 class EditSymbolsFileCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -385,7 +397,7 @@ class EditSymbolsFileCommand(sublime_plugin.WindowCommand):
                     "Source file does not exist:\n{}".format(symbols_path))
 
 
-# ------------------- Text command to insert text in the view ---------------------
+# ----------------- Text command to insert text in the view -------------------
 
 class LsInsertInView(TextCommand):
     def run(self, edit, text):

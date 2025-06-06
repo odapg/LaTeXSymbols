@@ -6,11 +6,10 @@ import hashlib
 import json
 import tempfile
 import subprocess
-# import shlex
 from pathlib import Path
 from functools import partial
 
-# --------------------------------- Configuration ---------------------------------
+# ------------------------------- Configuration -----------------------------
 
 # st_pkgs_dir = Path(__file__).resolve().parent.parent.parent
 st_pkgs_dir = sublime.packages_path()
@@ -47,7 +46,7 @@ TEMPLATE = r"""
 # Force real-time print output (for ST console)
 print = partial(print, flush=True)
 
-# ------------------------------------ Helpers ------------------------------------
+# ---------------------------------- Helpers --------------------------------
 
 def hash_filename(command, color, package=None):
     key = f"{command}-{color}-{package or 'latex'}"
@@ -70,7 +69,7 @@ def run_command(command, log_path=None):
     return result.returncode == 0
 
 
-# -------------------------------- Icon generator --------------------------------
+# ------------------------------- Icon generator ------------------------------
 
 def generate_icon(symbol, color):
     command = symbol["command"]
@@ -95,7 +94,7 @@ def generate_icon(symbol, color):
         basename = "symbol"
         tex_path = Path(tmpdir) / f"{basename}.tex"
         dvi_path = Path(tmpdir) / f"{basename}.dvi"
-        log_path = os.path.join(user_log_dir, f"{filename}.log")
+        # log_path = os.path.join(user_log_dir, f"{filename}.log")
 
         packages = ""
         if package and package.lower() != "latex":
@@ -108,40 +107,41 @@ def generate_icon(symbol, color):
         tex_path.write_text(tex_content)
 
         # Compile LaTeX
-        success = run_command([ "latex",
-                                "-interaction=nonstopmode",
-                                f"-output-directory={tmpdir}",
-                                tex_path
-                              ],
-                            # log_path=log_path
-                            )
+        success = run_command(["latex",
+                               "-interaction=nonstopmode",
+                               f"-output-directory={tmpdir}",
+                               tex_path
+                            ],
+                        # log_path=log_path
+                        )
         if not success or not dvi_path.exists():
             return None, "latex_failed"
 
         # Convert to PNG
-        success = run_command([ "dvipng",
-                                "-bg", "Transparent",
-                                "-T", "tight",
-                                "-D", f"{DPI}",
-                                "--gamma", f"{GAMMA}",
-                                "-o", f'{output_path}',
-                                f"{dvi_path}"
-                                ],
-                             # log_path=log_path,
-                            )
+        success = run_command(["dvipng",
+                               "-bg", "Transparent",
+                               "-T", "tight",
+                               "-D", f"{DPI}",
+                               "--gamma", f"{GAMMA}",
+                               "-o", f'{output_path}',
+                               f"{dvi_path}"
+                               ],
+                            # log_path=log_path,
+                        )
         if not success:
             return None, "dvipng_failed"
 
         # Resize with mogrify
-        success = run_command( ["mogrify",
+        success = run_command(["mogrify",
                                 "-resize", f'{ICON_SIZE}',
                                 "-extent", f'{ICON_SIZE}',
                                 "-background", "transparent",
-                                "-gravity", "South", #"center",
+                                "-gravity", "South",
+                                #"center",
                                 f'{output_path}',
                                 ]
                             # log_path=log_path,
-                            )
+                        )
         if not success:
             output_path.unlink(missing_ok=True)
             return None, "mogrify_failed"
@@ -163,7 +163,7 @@ def ls_refresh_database():
     # Ensure user directories exist
     Path(user_icon_dir_fullpath).mkdir(parents=True, exist_ok=True)
     for color in COLORS:
-        Path(os.path.join(user_icon_dir_fullpath,color)).mkdir(parents=True, exist_ok=True)
+        Path(os.path.join(user_icon_dir_fullpath, color)).mkdir(parents=True, exist_ok=True)
     # Path(user_log_dir).mkdir(parents=True, exist_ok=True)
 
     try:
@@ -196,7 +196,6 @@ def ls_refresh_database():
                 symbol_data["fontenc"] = table["fontenc"]
 
             paths = {}
-            icon_folder =os.path.join("LaTeXSymbols", "icons")
 
             for color in COLORS:
                 icon_name, status = generate_icon(symbol_data, color)
@@ -209,31 +208,27 @@ def ls_refresh_database():
                     paths[color] = icon_name
                     new_icon += 1
                 elif status == "latex_failed":
-                    print(msg + f"❌ LaTeX failed")
+                    print(msg + "❌ LaTeX failed")
                 elif status == "dvipng_failed":
-                    print(msg + f"❌ dvipng failed")
+                    print(msg + "❌ dvipng failed")
                 elif status == "mogrify_failed":
-                    print(msg + f"❌ mogrify failed")
+                    print(msg + "❌ mogrify failed")
 
             if paths:
-                metadata.append( {
+                metadata.append({
                     "name": command, 
                     "package": package,
                     "type": type_,
                     "keywords": keywords,
                     "path": paths,
-                } )
+                })
 
         with open(metadata_file, "w", encoding="utf-8") as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
 
-        print(f"\n✅ Done. {new_icon} new icons generated. \nData saved to {metadata_file}.")
+        print(f"\n✅ Done. {new_icon} new icons generated.\n"
+              f"Data saved to {metadata_file}.")
 
     except Exception as e:
-        print(f"""❌ There was an error when updating the data:\n{e}\n 
-                    User's symbols_data.json file was not generated.""")
-
-# ------------------------
-
-# if __name__ == "__main__":
-#     main()
+        print(f"❌ There was an error when updating the data:\n{e}\n" 
+              f"User's symbols_data.json file was not generated.")
