@@ -75,7 +75,7 @@ LaTeX Symbols for Sublime Text is adapted from [@wookayin](https://github.com/wo
 [alfred-latex-symbols-workflow](https://github.com/wookayin/alfred-latex-symbols-workflow). 
 Symbols were taken from there and completed (a bit) thanks to S. Pakin's 
 [Comprehensive LaTeX Symbol List](https://ctan.org/pkg/comprehensive).
-Inspiration came also from this 
+Inspiration also came from this 
 [post](https://forum.sublimetext.com/t/plugin-which-shows-a-popup-with-all-keybindings/69493)
 by [@giampaolo](https://github.com/giampaolo/) in 
 [Sublime forum](https://forum.sublimetext.com/).
