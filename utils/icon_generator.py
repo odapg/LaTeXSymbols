@@ -9,9 +9,9 @@ import subprocess
 from pathlib import Path
 from functools import partial
 
+
 # ------------------------------- Configuration -----------------------------
 
-# st_pkgs_dir = Path(__file__).resolve().parent.parent.parent
 st_pkgs_dir = sublime.packages_path()
 INPUT_YAML = "symbols.yaml"
 PKG_NAME = "LaTeXSymbols"
@@ -43,8 +43,9 @@ TEMPLATE = r"""
 
 # -------------------
 
-# Force real-time print output (for ST console)
+# Force real-time print output in ST console
 print = partial(print, flush=True)
+
 
 # ---------------------------------- Helpers --------------------------------
 
@@ -157,13 +158,14 @@ def ls_refresh_database():
     if os.path.exists(user_yaml_file):
         yaml_file = user_yaml_file
     else:
-        print(f"❌ No user symbol file.")
+        print("❌ No user symbol file.")
         return
 
     # Ensure user directories exist
     Path(user_icon_dir_fullpath).mkdir(parents=True, exist_ok=True)
     for color in COLORS:
-        Path(os.path.join(user_icon_dir_fullpath, color)).mkdir(parents=True, exist_ok=True)
+        icon_color_dir = os.path.join(user_icon_dir_fullpath, color)
+        Path(icon_color_dir).mkdir(parents=True, exist_ok=True)
     # Path(user_log_dir).mkdir(parents=True, exist_ok=True)
 
     try:

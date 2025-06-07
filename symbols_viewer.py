@@ -9,9 +9,19 @@ from collections import OrderedDict
 from sublime_plugin import TextCommand
 from .utils.icon_generator import ls_refresh_database
 
-# ------------------------------- Style sheets -------------------------------
 
+# ------------------------------- Configuration -----------------------------
+
+st_pkgs_dir = sublime.packages_path()
+PKG_NAME = "LaTeXSymbols"
+METADATA_FILE = "symbols_data.json"
+popup_width = 1500
+popup_height = 600
+icon_size = 16
+column_base_length = 21
 ls_settings = sublime.load_settings('LaTeXSymbols.sublime-settings')
+
+# ------------------------------- Style sheets -------------------------------
 
 background_dark = ls_settings.get('background_dark', '#354551')
 title_dark = ls_settings.get('title_dark', '#edab26')
@@ -33,9 +43,12 @@ insert_light = ls_settings.get('insert_light', '#75742b')
 
 
 DARK_STYLE = f"""<style>
-html {{background-color: {background_dark}; padding: 3px; border: 1px solid white; margin-bottom: 1;}}
-h1 {{color: {title_dark}; font-size: 1.2em; text-align: center; margin-top: 0; margin-bottom: 1;}}
-h3 {{color: {package_dark}; font-size: 1.1em; text-align: left; margin-top: 0; margin-bottom: 1;}}
+html {{background-color: {background_dark}; padding: 3px; 
+    border: 1px solid white; margin-bottom: 1;}}
+h1 {{color: {title_dark}; font-size: 1.2em; text-align: center; 
+    margin-top: 0; margin-bottom: 1;}}
+h3 {{color: {package_dark}; font-size: 1.1em; text-align: left; 
+    margin-top: 0; margin-bottom: 1;}}
 a {{ text-decoration: none; }}
 type-b {{ color: {b_dark}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
 type-t {{ color: {t_dark}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
@@ -45,9 +58,12 @@ insert {{ color: {insert_dark};}}
 </style>"""
 
 LIGHT_STYLE = f"""<style>
-html {{background-color: {background_light}; padding: 3px; border: 1px solid white; margin-bottom: 1;}}
-h1 {{color: {title_light}; font-size: 1.2em; text-align: center; margin-top: 0; margin-bottom: 1;}}
-h3 {{color: {package_dark}; font-size: 1.1em; text-align: left; margin-top: 0; margin-bottom: 1;}}
+html {{background-color: {background_light}; padding: 3px; 
+    border: 1px solid white; margin-bottom: 1;}}
+h1 {{color: {title_light}; font-size: 1.2em; text-align: center; 
+    margin-top: 0; margin-bottom: 1;}}
+h3 {{color: {package_dark}; font-size: 1.1em; text-align: left; 
+    margin-top: 0; margin-bottom: 1;}}
 a {{ text-decoration: none; }}
 type-b {{ color: {b_light}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
 type-t {{ color: {t_light}; font-size: 0.6em; padding-left: 4px; padding-right: 3px; }}
@@ -60,10 +76,8 @@ insert {{ color: {insert_light};}}
 # ------------------------------------  Helpers  ------------------------------------
 
 def load_symbols():
-    user_symbols_data = os.path.join(
-        sublime.packages_path(), "User", "LaTeXSymbols", "symbols_data.json")
-    ls_symbols_data = os.path.join(
-        sublime.packages_path(), "LaTeXSymbols", "symbols_data.json")
+    user_symbols_data = os.path.join(st_pkgs_dir, "User", PKG_NAME, METADATA_FILE)
+    ls_symbols_data = os.path.join(st_pkgs_dir, PKG_NAME, METADATA_FILE)
     if os.path.isfile(user_symbols_data):
         data_path = user_symbols_data
     else:
@@ -71,10 +85,10 @@ def load_symbols():
     with open(data_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-# -------------
+# ---------
 
 def image_to_base64(pkg_path):
-    abs_path = os.path.join(sublime.packages_path(), "LaTeXSymbols", pkg_path)
+    abs_path = os.path.join(st_pkgs_dir, PKG_NAME, pkg_path)
     try:
         with open(abs_path, "rb") as f:
             return base64.b64encode(f.read()).decode("utf-8")
@@ -82,15 +96,12 @@ def image_to_base64(pkg_path):
         print(f"Error loading image: {abs_path}", e)
         return None
 
-# -------------
+# ---------
 
 def generate_html(grouped):
-    icon_size = 16
-
-    ls_settings = sublime.load_settings('LaTeXSymbols.sublime-settings')
 
     max_per_row = ls_settings.get('columns_number')
-    if max_per_row < 2 or max_per_row > 5:
+    if max_per_row < 1 or max_per_row > 6:
         max_per_row = 4
 
     theme = ls_settings.get('popup_theme')
@@ -114,8 +125,11 @@ def generate_html(grouped):
 
             for j, s in enumerate(row):
                 name = s["name"]
-                ws = "&nbsp;" * (21 - len(name)) if j < max_per_row -1 else ""
-                icon_path = os.path.join(sublime.packages_path(), s["path"][color])
+                if j < max_per_row -1:
+                    spaces = "&nbsp;" * (column_base_length - len(name))
+                else:
+                    spaces = ""
+                icon_path = os.path.join(st_pkgs_dir, s["path"][color])
                 encoded = image_to_base64(icon_path)
                 if s["type"] == "both":
                     type = "<type-b>Ⓑ</type-b>"
@@ -125,17 +139,17 @@ def generate_html(grouped):
                     type = "<type-t>Ⓣ</type-t>"
                 html += f'''&nbsp;{type}
                             <img src="data:image/png;base64,{encoded}" 
-                            width="16" height="16">
+                            width="{icon_size}" height="{icon_size}">
                             <a href="{name}"><span class="latex-sym">
                             {name}</span></a>
-                            <a href="ins-{name}" ><insert>⎀</insert></a>{ws}
+                            <a href="ins-{name}" ><insert>⎀</insert></a>{spaces}
                             '''
             html += "</li></div>"
         html += "<br>"
     html += "</body></html>"
     return html
 
-# -------------
+# ---------
 
 def grouped_symbols(filtered):
     grouped = OrderedDict()
@@ -146,7 +160,7 @@ def grouped_symbols(filtered):
         grouped[package].append(symbol)
     return grouped
 
-# -------------
+# ---------
 
 def sort_key(package_name):
     return (0, "") if package_name == "latex" else (1, package_name.lower())
@@ -160,7 +174,6 @@ class SymbolSearchSession:
         self.view = view
         self.symbols = load_symbols()
         self.last_filter_text = ""
-        ls_settings = sublime.load_settings('LaTeXSymbols.sublime-settings')
         at_caret = ls_settings.get('at_caret')
         if at_caret:
             self.fixed_location = -1
@@ -168,13 +181,13 @@ class SymbolSearchSession:
             visible_region = self.view.visible_region()
             self.fixed_location = visible_region.a
 
-# -------------
+# ---------
 
     def on_change(self, text):
         self.last_filter_text = text.strip().lower()
         self.update_popup(self.last_filter_text)
 
-# -------------
+# ---------
 
     def update_popup(self, filter_text):
 
@@ -201,12 +214,12 @@ class SymbolSearchSession:
         self.view.show_popup(
             html,
             location= self.fixed_location,
-            max_width=1500,
-            max_height=600,
+            max_width=popup_width,
+            max_height=popup_height,
             on_navigate=self.on_click
         )
 
-# -------------
+# ---------
 
     def on_click(self, href):
         if href.startswith("ins-"):
@@ -219,7 +232,7 @@ class SymbolSearchSession:
             sublime.set_clipboard(href)
             sublime.status_message(f"LaTeX symbol copied to the clipboard: {href}")
 
-# -------------
+# ---------
 
     def on_done(self, text):
         pass
@@ -275,8 +288,8 @@ class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
         view.show_popup(
             html,
             location=self.session.fixed_location,
-            max_width=1500,
-            max_height=600,
+            max_width=popup_width,
+            max_height=popup_height,
             on_navigate=self.session.on_click
         )
 
@@ -323,8 +336,8 @@ class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
         view.show_popup(
             html,
             location=self.session.fixed_location,
-            max_width=1500,
-            max_height=600,
+            max_width=popup_width,
+            max_height=popup_height,
             on_navigate=self.session.on_click
         )
 
@@ -362,7 +375,7 @@ class RunIconGeneratorThread(threading.Thread):
         try:
             ls_refresh_database(),
         except Exception as e:
-            sublime.error_message("[LaTeXSymbols] Error running script:\n" + str(e))
+            sublime.error_message(f"[LaTeXSymbols] Error running script:\n{e}")
 
 
 class LatexSymbolsRefreshCommand(sublime_plugin.WindowCommand):
@@ -380,8 +393,8 @@ class EditSymbolsFileCommand(sublime_plugin.WindowCommand):
     def run(self):
         
         file_name = "symbols.yaml"
-        symbols_path = os.path.join(sublime.packages_path(), "LaTeXSymbols", file_name)
-        user_symbols_dir = os.path.join(sublime.packages_path(), "User", "LaTeXSymbols")
+        symbols_path = os.path.join(st_pkgs_dir, PKG_NAME, file_name)
+        user_symbols_dir = os.path.join(st_pkgs_dir, "User", PKG_NAME)
         user_symbols_path = os.path.join(user_symbols_dir, file_name)
 
         if os.path.exists(user_symbols_path):
@@ -394,7 +407,7 @@ class EditSymbolsFileCommand(sublime_plugin.WindowCommand):
                 self.window.open_file(user_symbols_path)
             else:
                 sublime.error_message(
-                    "Source file does not exist:\n{}".format(symbols_path))
+                    f"[LaTeXSymbols] Source file does not exist:\n{symbols_path}")
 
 
 # ----------------- Text command to insert text in the view -------------------

@@ -5,6 +5,7 @@
 LaTeX Symbols for Sublime Text is a simple ST4 package displaying a popup to help finding
 a LaTeX symbol. It opens an input panel to search symbols by name/keyword/package.
 
+![LaTeXSymbols example](./images/example.png)
 
 ## Manual installation
 
@@ -69,11 +70,15 @@ request!
 
 ## Acknowledgements
 
-LaTeX Symbols for Sublime Text is adapted from [wookayin](https://github.com/wookayin/)'s
+LaTeX Symbols for Sublime Text is adapted from [@wookayin](https://github.com/wookayin/)'s
 [Alfred](https://www.alfredapp.com/) workflow 
 [alfred-latex-symbols-workflow](https://github.com/wookayin/alfred-latex-symbols-workflow). 
 Symbols were taken from there and completed (a bit) thanks to S. Pakin's 
 [Comprehensive LaTeX Symbol List](https://ctan.org/pkg/comprehensive).
+Inspiration came also from this 
+[post](https://forum.sublimetext.com/t/plugin-which-shows-a-popup-with-all-keybindings/69493)
+by [@giampaolo](https://github.com/giampaolo/) in 
+[Sublime forum](https://forum.sublimetext.com/).
 
 alfred-latex-symbols-workflow is © 2015-2021 Jongwook Choi under the MIT License.
 
