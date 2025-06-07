@@ -53,7 +53,7 @@ database. For new symbols, the compilation process to generate thumbnails is run
 background and can be slow: check the console.
 
 This requires (for new symbols):
-- `dvipng` (usually coming with Tex distributions)
+- `dvipng` (usually coming with TeX distributions)
 - `mogrify` (coming with [`ImageMagick`](https://imagemagick.org/index.php))
 
 ## License
