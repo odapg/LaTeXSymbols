@@ -165,6 +165,15 @@ def grouped_symbols(filtered):
 def sort_key(package_name):
     return (0, "") if package_name == "latex" else (1, package_name.lower())
 
+# ---------
+
+def mid_point(view):
+    '''Locate mid-window'''
+    visible_reg = view.visible_region()
+    row_a = view.rowcol(visible_reg.a)[0]
+    row_b = view.rowcol(visible_reg.b)[0]
+    middle_row = (row_a + row_b) / 2 - 1
+    return view.text_point(middle_row, 1)
 
 # ----------------------------  Session state  --------------------------------
 
@@ -269,99 +278,130 @@ class LiveFilterLatexSymbolsCommand(sublime_plugin.WindowCommand):
 # ----------- Command to display symbols corresponding to a keyword ------------
 
 class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
-    def run(self, ls_keyword):
-        view = self.window.active_view()
-        self.session = SymbolSearchSession(view)
-
-        def matches(symbol):
-            keywords = symbol.get("keywords", [])
-            if isinstance(keywords, list):
-                lower_keywords = [kw.lower() for kw in keywords if isinstance(kw, str)]
-                return ls_keyword.lower() in lower_keywords
-            return False
-
-        filtered = [s for s in self.session.symbols if matches(s)]
-
-        grouped = grouped_symbols(filtered)
-        html = generate_html(grouped)
-
-        view.show_popup(
-            html,
-            location=self.session.fixed_location,
-            max_width=popup_width,
-            max_height=popup_height,
-            on_navigate=self.session.on_click
-        )
-
-    def input(self, args):
-        if "keyword" in args:
-            return None
-        return LsKeywordInputHandler()
-
-    def input_description(self):
-        return "[LaTeXSymbols] Keywords"
-
-
-class LsKeywordInputHandler(sublime_plugin.ListInputHandler):
-    def list_items(self):
-        symbols = load_symbols()
+    def run(self):
+        self.symbols = load_symbols()
         keywords = set()
-        for s in symbols:
+        for s in self.symbols:
             kws = s.get("keywords", [])
             if isinstance(kws, list):
                 for kw in kws:
                     if isinstance(kw, str):
                         keywords.add(kw)
-        return sorted(keywords)
 
-    def placeholder(self):
-        return ("Select a keyword")
+        self.keywords = sorted(keywords)
 
+        self.items = [kw for kw in self.keywords]
 
-# ---------- Command to display symbols corresponding to a package -----------
+        self.window.show_quick_panel(
+            self.items,
+            self.on_done,
+            on_highlight=self.on_highlight,
+            placeholder="[LaTeXSymbols] Select a keyword"
+        )
 
-class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
-    def run(self, ls_package):
+    def on_highlight(self, index):
+        if index == -1:
+            return
+
+        selected_keyword = self.keywords[index]
+        view = self.window.active_view()
+        popup_loc = mid_point(view)
+        self.preview_keyword(selected_keyword, popup_loc)
+
+    def on_done(self, index):
+        if index == -1:
+            self.window.active_view().hide_popup()
+            return
+
+        selected_keyword = self.keywords[index]
+        popup_loc = self.session.fixed_location
+        self.preview_keyword(selected_keyword, popup_loc)
+
+    def preview_keyword(self, keyword, popup_loc):
         view = self.window.active_view()
         self.session = SymbolSearchSession(view)
 
         def matches(symbol):
-            return symbol.get("package", "").lower() == ls_package.lower()
+            kws = symbol.get("keywords", [])
+            if isinstance(kws, list):
+                return keyword.lower() in [k.lower() for k in kws if isinstance(k, str)]
+            return False
 
         filtered = [s for s in self.session.symbols if matches(s)]
-
         grouped = grouped_symbols(filtered)
         html = generate_html(grouped)
 
         view.show_popup(
             html,
-            location=self.session.fixed_location,
+            location=popup_loc,
             max_width=popup_width,
             max_height=popup_height,
             on_navigate=self.session.on_click
         )
 
-    def input(self, args):
-        if "package" in args:
-            return None
-        return LsPackageInputHandler()
 
-    def input_description(self):
-        return "[LaTeXSymbols] Packages"
+# ---------- Command to display symbols corresponding to a package -----------
 
+class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
 
-class LsPackageInputHandler(sublime_plugin.ListInputHandler):
-    def list_items(self):
-        symbols = load_symbols()
-        packages = set()
-        for s in symbols:
-            pkg = s.get("package", "")
-            if isinstance(pkg, str) and pkg.strip():
-                packages.add(pkg.strip())
-        return sorted(packages)
+    def run(self):
+        self.symbols = load_symbols()
+        self.packages = sorted(set(
+            s.get("package", "").strip()
+            for s in self.symbols
+            if isinstance(s.get("package"), str) and s.get("package").strip()
+        ))
 
-    def placeholder(self):
-        return ("Select a package")
+        self.items = [pkg for pkg in self.packages]
+
+        self.window.show_quick_panel(
+            self.items,
+            self.on_done,
+            on_highlight=self.on_highlight,
+            placeholder="[LaTeXSymbols] Select a LaTeX package"
+        )
+
+    def on_highlight(self, index):
+        if index == -1:
+            return
+
+        selected_package = self.packages[index]
+        # Locate popup at mid-window
+        view = self.window.active_view()
+        popup_loc = mid_point(view)
+
+        self.preview_package(selected_package, popup_loc)
+
+    def on_done(self, index):
+        if index == -1:
+            self.window.active_view().hide_popup()
+            return
+
+        selected_package = self.packages[index]
+
+        view = self.window.active_view()
+        self.session = SymbolSearchSession(view)
+        popup_loc = self.session.fixed_location
+        self.preview_package(selected_package, popup_loc)
+
+    def preview_package(self, package, popup_loc):
+        view = self.window.active_view()
+        self.session = SymbolSearchSession(view)
+
+        def matches(symbol):
+            return symbol.get("package", "").lower() == package.lower()
+
+        filtered = [s for s in self.session.symbols if matches(s)]
+        grouped = grouped_symbols(filtered)
+        html = generate_html(grouped)
+
+        view.show_popup(
+            html,
+            location=popup_loc,
+            max_width=popup_width,
+            max_height=popup_height,
+            on_navigate=self.session.on_click
+        )
 
 
 # --------------------------  Refresh database  -------------------------------
