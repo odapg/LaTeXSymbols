@@ -15,11 +15,12 @@ from .utils.icon_generator import ls_refresh_database
 st_pkgs_dir = sublime.packages_path()
 PKG_NAME = "LaTeXSymbols"
 METADATA_FILE = "symbols_data.json"
-popup_width = 1500
+popup_width = 2000
 popup_height = 600
 icon_size = 16
 column_base_length = 21
 ls_settings = sublime.load_settings('LaTeXSymbols.sublime-settings')
+
 
 # ------------------------------- Style sheets -------------------------------
 
@@ -168,12 +169,12 @@ def sort_key(package_name):
 # ---------
 
 def mid_point(view):
-    '''Locate mid-window'''
+    '''Locate mid-window (actually a tiny bit higher)'''
     visible_reg = view.visible_region()
     row_a = view.rowcol(visible_reg.a)[0]
     row_b = view.rowcol(visible_reg.b)[0]
-    middle_row = (row_a + row_b) / 2 - 1
-    return view.text_point(middle_row, 1)
+    middle_row = (row_a + row_b) / 2 - 3
+    return view.text_point(middle_row, 10)
 
 # ----------------------------  Session state  --------------------------------
 
@@ -187,8 +188,10 @@ class SymbolSearchSession:
         if at_caret:
             self.fixed_location = -1
         else:    
-            visible_region = self.view.visible_region()
-            self.fixed_location = visible_region.a
+            visible_reg = view.visible_region()
+            # self.fixed_location = visible_reg.a
+            row_a = view.rowcol(visible_reg.a)[0]
+            self.fixed_location = view.text_point(row_a, 20)
 
 # ---------
 
@@ -285,15 +288,12 @@ class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
             kws = s.get("keywords", [])
             if isinstance(kws, list):
                 for kw in kws:
-                    if isinstance(kw, str):
-                        keywords.add(kw)
+                    if isinstance(kw, str): keywords.add(kw)
 
         self.keywords = sorted(keywords)
 
-        self.items = [kw for kw in self.keywords]
-
         self.window.show_quick_panel(
-            self.items,
+            self.keywords,
             self.on_done,
             on_highlight=self.on_highlight,
             placeholder="[LaTeXSymbols] Select a keyword"
@@ -352,10 +352,8 @@ class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
             if isinstance(s.get("package"), str) and s.get("package").strip()
         ))
 
-        self.items = [pkg for pkg in self.packages]
-
         self.window.show_quick_panel(
-            self.items,
+            self.packages,
             self.on_done,
             on_highlight=self.on_highlight,
             placeholder="[LaTeXSymbols] Select a LaTeX package"

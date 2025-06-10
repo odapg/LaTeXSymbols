@@ -5,7 +5,7 @@
   // "light": the background is light and the LaTeX characters are black
   "popup_theme": "dark",
 
-  // Should be between 1 and 6
+  // Should be between 1 and 6, according to the display
   "columns_number": 4,
 
   // true: the popup is displayed at caret position
