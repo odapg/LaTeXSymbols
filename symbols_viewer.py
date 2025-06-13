@@ -99,7 +99,7 @@ def image_to_base64(pkg_path):
 
 # ---------
 
-def generate_html(grouped):
+def generate_html(grouped, special_search=None, key=None):
 
     max_per_row = ls_settings.get('columns_number')
     if max_per_row < 1 or max_per_row > 6:
@@ -113,7 +113,15 @@ def generate_html(grouped):
         color = "black"
         STYLE = LIGHT_STYLE
 
-    html = "<html><body><h1>LaTeX Symbols</h1><br>"
+    if special_search == "keyword":
+        info = " — Keyword: " + key 
+    elif special_search == "package":
+        info = " — Package: " + key
+    elif special_search == "search":
+        info = " — Filter: " + key
+    else:
+        info = ""
+    html = f"<html><body><h1>LaTeX Symbols{info}</h1><br>"
     html += STYLE
 
     for package in sorted(grouped.keys(), key=sort_key):
@@ -221,7 +229,7 @@ class SymbolSearchSession:
         filtered = [s for s in self.symbols if matches(s)]
 
         grouped = grouped_symbols(filtered)
-        html = generate_html(grouped)
+        html = generate_html(grouped, special_search="search", key=filter_text)
 
         self.view.show_popup(
             html,
@@ -329,7 +337,7 @@ class LatexSymbolsByKeywordCommand(sublime_plugin.WindowCommand):
 
         filtered = [s for s in self.session.symbols if matches(s)]
         grouped = grouped_symbols(filtered)
-        html = generate_html(grouped)
+        html = generate_html(grouped, special_search="keyword", key=keyword)
 
         view.show_popup(
             html,
@@ -391,7 +399,7 @@ class LatexSymbolsByPackageCommand(sublime_plugin.WindowCommand):
 
         filtered = [s for s in self.session.symbols if matches(s)]
         grouped = grouped_symbols(filtered)
-        html = generate_html(grouped)
+        html = generate_html(grouped, special_search="package", key=package)
 
         view.show_popup(
             html,
